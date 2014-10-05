@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import TemplateDoesNotExist, render_to_string
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext as _
+from CECLessonApp.settings import EMAIL_FROM
 
 
 def get_signer(salt='email_registration'):
@@ -145,7 +146,7 @@ def render_to_mail(template, context, **kwargs):
             break
 
     body = u'\n'.join(lines).strip('\n')
-    message = EmailMultiAlternatives(subject=subject, body=body, **kwargs)
+    message = EmailMultiAlternatives(subject=subject, body=body, from_email=EMAIL_FROM, **kwargs)
 
     try:
         message.attach_alternative(
