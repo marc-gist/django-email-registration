@@ -52,4 +52,6 @@ Twitter Bootstrap.
 3. Add ``email_registration`` to ``INSTALLED_APPS`` and include
    ``email_registration.urls`` somewhere in your URLconf.
 
-4. Presto.
+4. Make sure that EMAIL_ options in settings.py are defined
+   I.e. EMAIL_HOST = smtp.server.provider.com, EMAIL_PORT = 587, E
+   MAIL_HOST_USER = , EMAIL_HOST_PASSWORD
