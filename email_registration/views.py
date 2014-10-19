@@ -1,7 +1,10 @@
+from smtplib import SMTPException
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
+from django.forms.util import ErrorList
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext as _, ugettext_lazy
@@ -30,6 +33,7 @@ class RegistrationForm(forms.Form):
         return email
 
 
+
 @require_POST
 def email_registration_form(request, form_class=RegistrationForm):
     # TODO unajaxify this view for the release?
@@ -37,11 +41,17 @@ def email_registration_form(request, form_class=RegistrationForm):
 
     if form.is_valid():
         email = form.cleaned_data['email']
-        send_registration_mail(email, request)
+        try:
+            send_registration_mail(email, request)
+            return render(request, 'registration/email_registration_sent.html', {
+                'email': email,
+            })
+        except SMTPException:
+            #return HttpResponse('Error - Unable to Send Email - please check your address and try again')
+            #raise forms.ValidationError(_('Unable to Send Email - Please check your address and try again'))
+            error = form._errors.setdefault('email', ErrorList())
+            error.append(u'Unable to Send Email - Please check your address and try again')
 
-        return render(request, 'registration/email_registration_sent.html', {
-            'email': email,
-        })
 
     return render(request, 'registration/email_registration_form.html', {
         'form': form,
@@ -63,7 +73,7 @@ def email_registration_confirm(request, code, max_age=3 * 86400):
             return redirect('/')
 
         user = User(
-            username=email if len(email) <= 30 else get_random_string(25),
+            username=email if len(email) <= 30 else get_random_string(10)+"_Change_Please",
             email=email)
 
     if request.method == 'POST':

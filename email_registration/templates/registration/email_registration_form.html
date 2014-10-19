@@ -7,7 +7,7 @@
     {% form_item_plain form.email %}
   </div>
   <br>
-  <button type="submit" class="btn btn-primary">
+  <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerHTML='please wait...';">
     {% trans "Register" %}</button>
   <style>
   #registration .form-errors span { display: none; }
