@@ -146,7 +146,7 @@ def render_to_mail(template, context, **kwargs):
             break
 
     body = u'\n'.join(lines).strip('\n')
-    message = EmailMultiAlternatives(subject=subject, body=body, from_email=EMAIL_FROM, bcc=EMAIL_FROM, **kwargs)
+    message = EmailMultiAlternatives(subject=subject, body=body, from_email=EMAIL_FROM, bcc=[EMAIL_FROM], **kwargs)
 
     try:
         message.attach_alternative(
