@@ -23,10 +23,13 @@ class RegistrationForm(forms.Form):
             'placeholder': ugettext_lazy('email address'),
         }),
     )
+    resetpw = forms.CheckboxInput()
+    userexists = False
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
         if email and User.objects.filter(email=email).exists():
+            self.userexists = True
             raise forms.ValidationError(_(
                 'This email address already exists as an account.'
                 ' Did you want to reset your password?'))
@@ -36,10 +39,11 @@ class RegistrationForm(forms.Form):
 
 @require_POST
 def email_registration_form(request, form_class=RegistrationForm):
-    # TODO unajaxify this view for the release?
+
     form = form_class(request.POST)
 
     if form.is_valid():
+
         email = form.cleaned_data['email']
         try:
             send_registration_mail(email, request)
@@ -51,9 +55,20 @@ def email_registration_form(request, form_class=RegistrationForm):
             #raise forms.ValidationError(_('Unable to Send Email - Please check your address and try again'))
             error = form._errors.setdefault('email', ErrorList())
             error.append(u'Unable to Send Email - Please check your address and try again')
+    else:
+        #lets look at sending a reset user
+        if form.userexists and form.resetpw.check_test:
+            email = form['email'].value()
+            try:
+                user = User.objects.get(email=email)
+                send_registration_mail(email, request, user=user)
+                return render(request, 'registration/email_registration_sent.html', {
+                    'email': email,
+                })
+            except User.DoesNotExist:
+                pass
 
-
-    return render(request, 'registration/email_registration_form.html', {
+    return render(request, 'register.html', {
         'form': form,
     })
 
@@ -73,7 +88,8 @@ def email_registration_confirm(request, code, max_age=3 * 86400):
             return redirect('/')
 
         user = User(
-            username=email if len(email) <= 30 else get_random_string(10)+"_Change_Please",
+            # username=email if len(email) <= 30 else get_random_string(10)+"_Change_Please",
+            username=email[0:30],
             email=email)
 
     if request.method == 'POST':
@@ -91,7 +107,7 @@ def email_registration_confirm(request, code, max_age=3 * 86400):
             messages.success(request, _(
                 'Successfully set the new password. Please login now.'))
 
-            return redirect('login')
+            return redirect('/')
 
     else:
         messages.success(request, _('Please set a password.'))

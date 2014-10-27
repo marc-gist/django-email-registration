@@ -1,5 +1,8 @@
+{% extends 'base.html' %}
 {% load i18n %}
+{% block content %}
 <div class="well">
   <p>{% blocktrans %}We sent you an email to {{ email }}.
   Please click the contained link to finish your registration.{% endblocktrans %}</p>
 </div>
+{% endblock %}

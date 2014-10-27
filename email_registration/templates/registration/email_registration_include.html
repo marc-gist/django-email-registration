@@ -1,32 +1,37 @@
-{% load i18n %}
+{% load i18n towel_form_tags %}
 {% load url from future %}
-<form method="post" action="{% url "email_registration_form" %}" class="well" id="registration">
+<script language="javascript">
+    function resetPassword(obj) {
+        //console.log($(obj));
+        if ( $(obj).prop('checked') ) {
+            $('#submitbtn').text('Reset Password');
+        } else {
+            $('#submitbtn').text('Register');
+        }
+    }
+</script>
+<form method="post" action="{% url "email_registration_form" %}" class="well" id="registration" id="regform">
   {% csrf_token %}
+  {% form_errors form %}
   <div class="controls">
+      {% if form %}
+          {% form_item_plain form.email %}
+      {% else %}
     <input id="id_email" type="text" name="email" maxlength="75"
-      placeholder="{% trans "Email address" %}">
+      placeholder="{% trans "Email address" %}" />
+      {% endif %}
+    <input type="checkbox" id="resetpw" name="resetpw" value="yes" onchange="resetPassword(this);" /> Reset password?
   </div>
   <br>
-  <button type="submit" class="btn btn-primary" onclick="this.disabled=true; this.innerHTML='please wait...';">
+  <button type="submit" class="btn btn-primary" id="submitbtn">
     {% trans "Register" %}</button>
+    {% if form %}
+{#        we might have use of send new link #}
+        <script language="javascript">
+        $('form').submit(function() {
+            $('#submitbtn').attr('disabled', 'disabled');
+            $('#submitbtn').text('please wait...');
+        });
+        </script>
+    {% endif %}
 </form>
-
-<script>
-function init_registration($) {
-  $('#registration').on('submit', function() {
-    var $form = $(this);
-    $.post(this.action, $form.serialize(), function(data) {
-      $('#registration').replaceWith(data);
-      init_registration($);
-    });
-    return false;
-  });
-}
-
-if (typeof(onReady) == 'object') {
-  // towel_bootstrap
-  onReady.push(init_registration);
-} else if (jQuery) {
-  jQuery(init_registration);
-}
-</script>
