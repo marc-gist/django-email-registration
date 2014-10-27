@@ -23,7 +23,7 @@ class RegistrationForm(forms.Form):
             'placeholder': ugettext_lazy('email address'),
         }),
     )
-    resetpw = forms.CheckboxInput()
+    resetpw = forms.BooleanField(label=u'Rest password?', required=False)
     userexists = False
 
     def clean_email(self):
@@ -43,7 +43,6 @@ def email_registration_form(request, form_class=RegistrationForm):
     form = form_class(request.POST)
 
     if form.is_valid():
-
         email = form.cleaned_data['email']
         try:
             send_registration_mail(email, request)
@@ -57,14 +56,24 @@ def email_registration_form(request, form_class=RegistrationForm):
             error.append(u'Unable to Send Email - Please check your address and try again')
     else:
         #lets look at sending a reset user
-        if form.userexists and form.resetpw.check_test:
+        if form.userexists and form['resetpw'].value():
             email = form['email'].value()
             try:
                 user = User.objects.get(email=email)
-                send_registration_mail(email, request, user=user)
-                return render(request, 'registration/email_registration_sent.html', {
-                    'email': email,
-                })
+                """:type user: User"""
+                if user.is_active:
+                    send_registration_mail(email, request, user=user)
+                    return render(request, 'registration/email_registration_sent.html', {
+                        'email': email,
+                    })
+                else:
+                    messages.error(request, 'Error trying to reset password; please contact us.')
+                    return redirect('/')
+            except SMTPException:
+                #return HttpResponse('Error - Unable to Send Email - please check your address and try again')
+                #raise forms.ValidationError(_('Unable to Send Email - Please check your address and try again'))
+                error = form._errors.setdefault('email', ErrorList())
+                error.append(u'Unable to Send Email - Please check your address and try again')
             except User.DoesNotExist:
                 pass
 

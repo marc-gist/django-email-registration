@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block title %}
+    Registration
+{% endblock %}
+{% block page_header %}
+    Email Sent
+{% endblock %}
 {% block content %}
 <div class="well">
   <p>{% blocktrans %}We sent you an email to {{ email }}.

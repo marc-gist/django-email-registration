@@ -1,7 +1,7 @@
 {% load i18n %}
 {% trans "Registration link" %}
 
-{% trans "Click the following link to activate your account:" %}
+{% trans "Click the following link to activate/reset your account:" %}
 
 {{ url }}
 
