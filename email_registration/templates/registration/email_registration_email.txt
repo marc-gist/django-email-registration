@@ -1,5 +1,5 @@
 {% load i18n %}
-{% trans "Registration link" %}
+{% trans "Registration link" %} {{ SITE_NAME }}
 
 {% trans "Click the following link to activate/reset your account:" %}
 

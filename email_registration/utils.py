@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import TemplateDoesNotExist, render_to_string
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext as _
+from django.conf import settings
 
 
 def get_signer(salt='email_registration'):
@@ -55,11 +56,16 @@ def send_registration_mail(email, request, user=None, **kwargs):
                 'code': get_signer().sign(u':'.join(code)),
             }))
 
+    contextList = {
+        'url': url,
+    }
+
+    if settings.EMAIL_CONTEXT:
+        contextList.update(settings.EMAIL_CONTEXT)
+
     render_to_mail(
         'registration/email_registration_email',
-        {
-            'url': url,
-        },
+        context=contextList,
         to=[email], **kwargs
     ).send()
 
