@@ -9,6 +9,7 @@ from django.shortcuts import redirect, render
 from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.decorators.http import require_POST
+from django.conf import settings
 
 from email_registration.signals import password_set
 from email_registration.utils import (
@@ -45,7 +46,7 @@ def email_registration_form(request, form_class=RegistrationForm):
     if form.is_valid():
         email = form.cleaned_data['email']
         try:
-            send_registration_mail(email, request)
+            send_registration_mail(email, request, from_email=settings.EMAIL_FROM, bcc=[settings.EMAIL_FROM])
             return render(request, 'registration/email_registration_sent.html', {
                 'email': email,
             })
@@ -62,7 +63,7 @@ def email_registration_form(request, form_class=RegistrationForm):
                 user = User.objects.get(email=email)
                 """:type user: User"""
                 if user.is_active:
-                    send_registration_mail(email, request, user=user)
+                    send_registration_mail(email, request, user=user, from_email=EMAIL_FROM, bcc=[EMAIL_FROM])
                     return render(request, 'registration/email_registration_sent.html', {
                         'email': email,
                     })

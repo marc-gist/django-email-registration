@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 from django.template.loader import TemplateDoesNotExist, render_to_string
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext as _
-from CECLessonApp.settings import EMAIL_FROM
 
 
 def get_signer(salt='email_registration'):
@@ -23,7 +22,7 @@ def get_last_login_timestamp(user):
     return int(user.last_login.strftime('%s')) if user.last_login else 0
 
 
-def send_registration_mail(email, request, user=None):
+def send_registration_mail(email, request, user=None, **kwargs):
     """
     Sends the registration mail
 
@@ -61,7 +60,7 @@ def send_registration_mail(email, request, user=None):
         {
             'url': url,
         },
-        to=[email],
+        to=[email], **kwargs
     ).send()
 
 
@@ -146,7 +145,7 @@ def render_to_mail(template, context, **kwargs):
             break
 
     body = u'\n'.join(lines).strip('\n')
-    message = EmailMultiAlternatives(subject=subject, body=body, from_email=EMAIL_FROM, bcc=[EMAIL_FROM], **kwargs)
+    message = EmailMultiAlternatives(subject=subject, body=body, **kwargs)
 
     try:
         message.attach_alternative(
