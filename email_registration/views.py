@@ -63,7 +63,7 @@ def email_registration_form(request, form_class=RegistrationForm):
                 user = User.objects.get(email=email)
                 """:type user: User"""
                 if user.is_active:
-                    send_registration_mail(email, request, user=user, from_email=EMAIL_FROM, bcc=[EMAIL_FROM])
+                    send_registration_mail(email, request, user=user, from_email=settings.EMAIL_FROM, bcc=[settings.EMAIL_FROM])
                     return render(request, 'registration/email_registration_sent.html', {
                         'email': email,
                     })
