@@ -21,6 +21,10 @@
       placeholder="{% trans "Email address" %}" />
       {% endif %}
     <input type="checkbox" id="resetpw" name="resetpw" value="yes" onchange="resetPassword(this);" /> Reset password?
+
+    {% if reCAPTCHA %}
+    <div class="g-recaptcha" data-sitekey="6Le6wgATAAAAANp21Z2sSGILrBydmlResPz9nTiU"></div>
+    {% endif %}
   </div>
   <br>
   <button type="submit" class="btn btn-primary" id="submitbtn">

@@ -10,6 +10,7 @@ from django.utils.crypto import get_random_string
 from django.utils.translation import ugettext as _, ugettext_lazy
 from django.views.decorators.http import require_POST
 from django.conf import settings
+from google_recaptacha_v2 import recaptcha
 
 from email_registration.signals import password_set
 from email_registration.utils import (
@@ -36,6 +37,8 @@ class RegistrationForm(forms.Form):
                 ' Did you want to reset your password?'))
         return email
 
+    # def clean(self):
+    #     return self.cleaned_data
 
 
 @require_POST
@@ -45,6 +48,14 @@ def email_registration_form(request, form_class=RegistrationForm):
 
     if form.is_valid():
         email = form.cleaned_data['email']
+        if hasattr(settings, 'RECAPTCHA') and settings.RECAPTCHA and settings.RECAPTCHA_KEY:
+            recapptcah_response = recaptcha.submit(
+                settings.RECAPTCHA_KEY,
+                request.POST.get('g-recaptcha-response'),
+                request.META.get("REMOTE_ADDR"))
+            if not recapptcah_response.is_valid:
+                messages.error(request, 'Invalid reCAPTCHA - are you a robot? %s' % recapptcah_response.get_error())
+                return redirect('/')
         try:
             send_registration_mail(email, request, from_email=settings.EMAIL_FROM, bcc=[settings.EMAIL_FROM])
             return render(request, 'registration/email_registration_sent.html', {
