@@ -46,16 +46,18 @@ def email_registration_form(request, form_class=RegistrationForm):
 
     form = form_class(request.POST)
 
+    if hasattr(settings, 'RECAPTCHA') and settings.RECAPTCHA and settings.RECAPTCHA_KEY:
+        recapptcah_response = recaptcha.submit(
+            settings.RECAPTCHA_KEY,
+            request.POST.get('g-recaptcha-response'),
+            request.META.get("REMOTE_ADDR"))
+        if not recapptcah_response.is_valid:
+            messages.error(request, 'Invalid reCAPTCHA - are you a robot? %s' % recapptcah_response.get_error())
+            return redirect('/')
+
     if form.is_valid():
         email = form.cleaned_data['email']
-        if hasattr(settings, 'RECAPTCHA') and settings.RECAPTCHA and settings.RECAPTCHA_KEY:
-            recapptcah_response = recaptcha.submit(
-                settings.RECAPTCHA_KEY,
-                request.POST.get('g-recaptcha-response'),
-                request.META.get("REMOTE_ADDR"))
-            if not recapptcah_response.is_valid:
-                messages.error(request, 'Invalid reCAPTCHA - are you a robot? %s' % recapptcah_response.get_error())
-                return redirect('/')
+
         try:
             send_registration_mail(email, request, from_email=settings.EMAIL_FROM, bcc=[settings.EMAIL_FROM])
             return render(request, 'registration/email_registration_sent.html', {
