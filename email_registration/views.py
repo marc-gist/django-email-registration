@@ -3,7 +3,7 @@ from django import forms
 from django.contrib import messages
 from django.contrib.auth.forms import SetPasswordForm
 from django.contrib.auth.models import User
-from django.forms.util import ErrorList
+from django.forms.utils import ErrorList
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.crypto import get_random_string
