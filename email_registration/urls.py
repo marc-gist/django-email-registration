@@ -1,12 +1,11 @@
 from django.conf.urls import patterns, url
+from . import views
 
-
-urlpatterns = patterns(
-    'email_registration.views',
+urlpatterns = [
     url(r'^$',
-        'email_registration_form',
+        views.email_registration_form,
         name='email_registration_form'),
     url(r'^(?P<code>[^/]+)/$',
-        'email_registration_confirm',
+        views.email_registration_confirm,
         name='email_registration_confirm'),
-)
+]
