@@ -2,6 +2,11 @@
 django-email-registration
 =========================
 
+marc-gist MODIFICATIONS:
+========================
+Thanks to the original creator, but I have now heavily modified this to work in my applications.
+
+
 The eleventy-eleventh email registration app for Django.
 
 But this one does not feed your cat.
