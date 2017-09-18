@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.core import signing
 from django.core.mail import EmailMultiAlternatives
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.template.loader import TemplateDoesNotExist, render_to_string
 from django.utils.http import int_to_base36
 from django.utils.translation import ugettext as _
